@@ -32,8 +32,10 @@ pipeline {
                     
                     // Activate venv and install dependencies
                     sh """
-                    source ${VENV_PATH}/bin/activate
-                    pip install --no-cache-dir -r requirements.txt
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    python -m unittest discover
+
                     """
 
                     // Since you don't have tests, we'll run a static check 
