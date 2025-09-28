@@ -50,7 +50,11 @@ pipeline {
                 }
             }
         }
-
+         stage('Clean Workspace') {
+    steps {
+        cleanWs()
+    }
+}
         // 3. Deployment Stage (Manual Approval for Production)
         // This stage assumes you have a separate EC2/Linux machine for deployment
         stage('Deploy to EC2') {
