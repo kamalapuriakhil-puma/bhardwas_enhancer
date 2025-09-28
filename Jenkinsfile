@@ -55,7 +55,11 @@ pipeline {
         // This stage assumes you have a separate EC2/Linux machine for deployment
         stage('Deploy to EC2') {
             // A common practice is to use a dedicated agent/node that has SSH access configured
-            agent any // <-- REPLACE THIS WITH A JENKINS NODE LABEL
+             agent {
+        docker {
+            image 'python:3.9' // NOT the slim image
+        }
+    }
 
             steps {
                 echo 'Starting deployment to EC2 instance...'
