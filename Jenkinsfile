@@ -66,7 +66,7 @@ pipeline {
                 
                 // 1. Copy the entire project folder to the EC2 instance
                 //    (Replace user@ip:/path/ with your actual details)
-                sshagent(['jenkins-ec2-key']) { // Assumes a pre-configured SSH key in Jenkins credentials
+                sshagent(['2c007a4a-d4b8-4a93-bce4-ed7a39be03d7']) { // Assumes a pre-configured SSH key in Jenkins credentials
                     sh """
                     scp -r * user@3.110.155.238:/home/user/bhardwas_app/
                     
