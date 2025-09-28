@@ -19,7 +19,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 // Retrieves the source code from your version control (e.g., Git)
-                git branch: 'main', url: 'YOUR_GIT_REPOSITORY_URL' // <-- REPLACE THIS
+                git branch: 'main', url: 'https://github.com/kamalapuriakhil-puma/bhardwas_enhancer.git' // <-- REPLACE THIS
             }
         }
 
@@ -69,7 +69,7 @@ pipeline {
                     scp -r * user@YOUR_EC2_PUBLIC_IP:/home/user/bhardwas_app/
                     
                     # 2. Connect via SSH and run deployment commands (install dependencies, start service)
-                    ssh user@YOUR_EC2_PUBLIC_IP << EOF
+                    ssh user@3.110.155.238 << EOF
                         cd /home/user/bhardwas_app
                         
                         # Use system-wide python/pip or set up venv on the server
