@@ -55,7 +55,7 @@ pipeline {
         // This stage assumes you have a separate EC2/Linux machine for deployment
         stage('Deploy to EC2') {
             // A common practice is to use a dedicated agent/node that has SSH access configured
-            agent { label 'your-deployment-node' } // <-- REPLACE THIS WITH A JENKINS NODE LABEL
+            agent any // <-- REPLACE THIS WITH A JENKINS NODE LABEL
 
             steps {
                 echo 'Starting deployment to EC2 instance...'
@@ -68,7 +68,7 @@ pipeline {
                 //    (Replace user@ip:/path/ with your actual details)
                 sshagent(['jenkins-ec2-key']) { // Assumes a pre-configured SSH key in Jenkins credentials
                     sh """
-                    scp -r * user@YOUR_EC2_PUBLIC_IP:/home/user/bhardwas_app/
+                    scp -r * user@3.110.155.238:/home/user/bhardwas_app/
                     
                     # 2. Connect via SSH and run deployment commands (install dependencies, start service)
                     ssh user@3.110.155.238 << EOF
@@ -85,7 +85,7 @@ pipeline {
                     EOF
                     """
                 }
-                echo 'Deployment successful! Check http://YOUR_EC2_PUBLIC_IP:5000'
+                echo 'Deployment successful! Check http://3.110.155.238:5000'
             }
         }
     }
