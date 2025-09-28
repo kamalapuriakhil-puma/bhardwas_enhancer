@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhardwas Enhancer - Photo Enhancement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .tagline {
+            color: #3498db;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        #drop-area {
+            border: 2px dashed #bdc3c7;
+            border-radius: 10px;
+            padding: 50px 20px;
+            margin: 30px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #drop-area.highlight {
+            background-color: #ecf0f1;
+        }
+        .upload-text {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        .download-link {
+            display: none;
+            margin-top: 20px;
+        }
+        .download-link a {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .download-link a:hover {
+            background-color: #27ad60;
+        }
+        #status-message {
+            margin-top: 15px;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bhardwas Enhancer</h1>
+        <p class="tagline">Clarity, defined. Your photos, elevated.</p>
+
+        <div id="drop-area">
+            <input type="file" id="fileElem" accept="image/*" hidden>
+            <label for="fileElem" class="upload-text">Drag & Drop photo here, or **Click to Upload**</label>
+        </div>
+
+        <button id="enhance-btn" style="padding: 10px 30px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em; display: none;" disabled>Enhance Image</button>
+
+        <p id="status-message"></p>
+
+        <div class="download-link" id="result-link-container">
+            <a id="download-link" href="#" download>Download Enhanced Image</a>
+        </div>
+    </div>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileElem = document.getElementById('fileElem');
+        const enhanceBtn = document.getElementById('enhance-btn');
+        const statusMessage = document.getElementById('status-message');
+        const resultLinkContainer = document.getElementById('result-link-container');
+        const downloadLink = document.getElementById('download-link');
+        let selectedFile = null;
+
+        // --- Drag and Drop Handlers ---
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+            handleFiles(files);
+        }
+
+        // --- File Selection Handlers ---
+        fileElem.addEventListener('change', (e) => handleFiles(e.target.files));
+        dropArea.addEventListener('click', () => fileElem.click());
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                selectedFile = files[0];
+                const filename = selectedFile.name;
+                statusMessage.textContent = `File selected: ${filename}. Click Enhance!`;
+                statusMessage.style.color = '#2980b9';
+                enhanceBtn.style.display = 'block';
+                enhanceBtn.disabled = false;
+                resultLinkContainer.style.display = 'none';
+            }
+        }
+
+        // --- Enhancement Button Click ---
+        enhanceBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                statusMessage.textContent = 'Please select an image first.';
+                statusMessage.style.color = '#e74c3c';
+                return;
+            }
+
+            statusMessage.textContent = 'Enhancing image... Please wait.';
+            statusMessage.style.color = '#f39c12';
+            enhanceBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/enhance', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    statusMessage.textContent = 'Enhancement complete! Your image is ready.';
+                    statusMessage.style.color = '#2ecc71';
+                    downloadLink.href = result.download_url;
+                    resultLinkContainer.style.display = 'block';
+                } else {
+                    statusMessage.textContent = result.message || 'Error processing the image.';
+                    statusMessage.style.color = '#e74c3c';
+                }
+
+            } catch (error) {
+                statusMessage.textContent = 'Network or server error during enhancement.';
+                statusMessage.style.color = '#e74c3c';
+                console.error('Fetch Error:', error);
+            } finally {
+                enhanceBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
